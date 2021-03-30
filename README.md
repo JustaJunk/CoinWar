@@ -1,4 +1,4 @@
-# JustaDual
+# JustaDuel
 Ethereum game (#ChainlinkHackathon2020)  
 Inspired by yu-gi-oh (a classic anime)
 
@@ -8,14 +8,14 @@ After a while (maybe a long while :D), you can harvest and what you get is a car
 The larger the increase of the coin price, the more powerful card you'll get.  
 
 ## Card & Token
-With card you can dual with others.  
+With card you can duel with others.  
 Or you just want to show how good is your price prediction :D  
 With token you can enhance your card.  
 If you don't want a card, you can burn it to get some token.  
 The more powerful card your burn, the more token you'll get.  
 
-## Dual
-Arrange yor card (at most 5) and dual with others.  
+## Duel
+Arrange yor card (at most 5) and duel with others.  
 This is your card slot look like: | ETH0 | LINK | UNI | COMP | ETH1 |  
 Different type of card has different effect.  
 ### ETH0

@@ -6,7 +6,7 @@ import "https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/
 
 contract CardFactory {
  
-    enum CoinType{ETH, LINK, UNI, COMP, NONE}
+    enum CoinType{ETH, LINK, UNI, COMP}
    
     AggregatorV3Interface private priceFeedETH;
     AggregatorV3Interface private priceFeedLINK;
@@ -17,8 +17,8 @@ contract CardFactory {
     event NewCard(uint indexed cardId, CoinType indexed coinType, int seedPrice, int nowPrice, int power);
     
     int private significand = 1000;
-    uint public nowSeedId;
-    uint public nowCardId;
+    uint public seedCount;
+    uint public cardCount;
     
     struct Seed {
         CoinType    coinType;
@@ -39,8 +39,8 @@ contract CardFactory {
     mapping (address => uint) internal ownerCardCount;
 
     constructor() {
-        nowSeedId = 0;
-        nowCardId = 0;
+        seedCount = 0;
+        cardCount = 0;
         priceFeedETH = AggregatorV3Interface(0x9326BFA02ADD2366b30bacB125260Af641031331);
         priceFeedLINK = AggregatorV3Interface(0x396c5E36DD0a0F5a5D33dae44368D4193f69a1F0);
         priceFeedUNI = AggregatorV3Interface(0xDA5904BdBfB4EF12a3955aEcA103F51dc87c7C39);
@@ -55,21 +55,21 @@ contract CardFactory {
 
     function _plantSeed(CoinType _coinType, int _price) private {
         seeds.push(Seed(_coinType, _price));
-        seedToOwner[nowSeedId] = msg.sender;
-        emit NewSeed(nowSeedId, _coinType, _price);
-        nowSeedId = nowSeedId++;
-        ownerSeedCount[msg.sender] = ownerSeedCount[msg.sender]++;
+        seedToOwner[seedCount] = msg.sender;
+        emit NewSeed(seedCount, _coinType, _price);
+        seedCount += 1;
+        ownerSeedCount[msg.sender] += 1;
     }  
 
     function _printCard(CoinType _coinType, uint _seedId, int _price) private {
         int seedPrice = seeds[_seedId].price; 
         int power = _price*significand/seedPrice - significand;
         cards.push(Card(_coinType, power));
-        cardToOwner[nowCardId] = msg.sender;
+        cardToOwner[cardCount] = msg.sender;
         seedToOwner[_seedId] = address(0);
-        emit NewCard(nowCardId, _coinType, seedPrice, _price, power);
-        nowCardId = nowCardId++;
-        ownerCardCount[msg.sender] = ownerCardCount[msg.sender]++;
+        emit NewCard(cardCount, _coinType, seedPrice, _price, power);
+        cardCount += 1;
+        ownerCardCount[msg.sender] += 1;
     }
 
     function plantSeedETH() public {

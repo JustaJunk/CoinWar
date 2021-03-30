@@ -29,8 +29,8 @@ abstract contract CardOwnership is CardHelper, ERC741 {
     }
 
     function _itemTransfer(address _from, address _to, uint _cardId) internal {
-        ownerCardCount[_to] = ownerCardCount[_to]++;
-        ownerCardCount[msg.sender] = ownerCardCount[msg.sender]--;
+        ownerCardCount[_to] += 1;
+        ownerCardCount[msg.sender] -= 1;
         cardToOwner[_cardId] = _to;
         emit ItemTransfer(_from, _to, _cardId);
     }

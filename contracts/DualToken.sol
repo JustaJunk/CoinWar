@@ -1,10 +1,10 @@
-// CryptoDualToken.sol
+// DualToken.sol
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "./CardOwnership.sol";
 
-contract CryptoDualToken is CardOwnership {
+contract DualToken is CardOwnership {
 
     uint private _totalSupply;
 

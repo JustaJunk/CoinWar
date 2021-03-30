@@ -18,7 +18,7 @@ interface ERC741 {
 
     // ERC721
     event ItemTransfer(address indexed _from, address indexed _to, uint indexed _itemId);
-    event TtemApproval(address indexed _owner, address indexed _approved, uint indexed _itemId);  
+    event ItemApproval(address indexed _owner, address indexed _approved, uint indexed _itemId);  
 
     function itemBalanceOf(address _owner) external view returns (uint);
     function itemOwnerOf(uint _itemId) external view returns (address);

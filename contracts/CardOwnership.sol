@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./CardDisplay.sol";
-import "./ERC741.sol";
+import "./CardHelper.sol";
+import "../interfaces/ERC741.sol";
 
-abstract contract CardOwnership is CardDisplay, ERC741 {
+abstract contract CardOwnership is CardHelper, ERC741 {
     
     mapping (uint => address) private _cardApprovals;
 

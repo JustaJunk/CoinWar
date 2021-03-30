@@ -1,10 +1,10 @@
-// CardDisplay.sol
+// CardHelper.sol
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "./CardFactory.sol";
 
-contract CardDisplay is CardFactory {
+contract CardHelper is CardFactory {
 
     function getSeedsByOwner(address _owner) external view returns(uint[] memory) {
         uint[] memory seedList = new uint[](ownerSeedCount[_owner]);

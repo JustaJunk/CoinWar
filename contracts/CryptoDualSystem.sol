@@ -2,18 +2,33 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./CryptoDualLifePoints.sol";
+import "./CryptoDualToken.sol";
 
-contract CryptoDualSystem is CryptoDualLifePoints {
+contract CryptoDualSystem is CryptoDualToken {
 
-	address cardAddress;
+	event MintToken(uint indexed _cardId, uint _value);
+	event TurnCard(uint indexed _cardId, int _power);
 
-	constructor(address _cardAddress) CryptoDualLifePoints(800000000000) {
-		cardAddress = _cardAddress;
+	constructor() CryptoDualToken(77777777777777) {}
+
+	function MintTokenByCard(uint _cardId) external {
+		require(msg.sender == cardToOwner[_cardId]);
+		uint value = uint(cards[_cardId].power);
+		require(value >= 0);
+		_itemTransfer(msg.sender, address(0), _cardId);
+		_tokenMint(msg.sender, value);
+
+		emit MintToken(_cardId, value);
 	}
 
-	function dual(address _player1, uint[] calldata _cardIds1,
-				  address _player2, uint[] calldata _cardIds2) {
+	function TurnCardPowerToPositive(uint _cardId) external {
+		require(msg.sender == cardToOwner[_cardId]);
+		int value = cards[_cardId].power;
+		require(value < 0);
+		uint cost = uint(-value*2);
+		_tokenBurn(msg.sender, cost);
+		cards[_cardId].power = -value;
 
+		emit TurnCard(_cardId, -value);
 	}
 }

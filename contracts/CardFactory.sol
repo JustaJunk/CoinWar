@@ -6,7 +6,7 @@ import "https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/
 
 contract CardFactory {
  
-    enum CoinType{ETH, LINK, UNI, COMP}
+    enum CoinType{ETH, LINK, UNI, COMP, NONE}
    
     AggregatorV3Interface private priceFeedETH;
     AggregatorV3Interface private priceFeedLINK;

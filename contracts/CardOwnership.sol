@@ -3,35 +3,35 @@
 pragma solidity ^0.8.0;
 
 import "./CardDisplay.sol";
-import "../interfaces/ERC721.sol";
+import "./ERC741.sol";
 
-contract CardOwnership is CardDisplay, ERC721 {
+abstract contract CardOwnership is CardDisplay, ERC741 {
     
-    mapping (uint => address) cardApprovals;
+    mapping (uint => address) private _cardApprovals;
 
-    function balanceOf(address _owner) override external view returns (uint) {
+    function itemBalanceOf(address _owner) override external view returns (uint) {
         return ownerCardCount[_owner];
     }   
 
-    function ownerOf(uint _cardId) override external view returns (address) {
+    function itemOwnerOf(uint _cardId) override external view returns (address) {
         return cardToOwner[_cardId];
     }
 
-    function transferFrom(address _from, address _to, uint _cardId) override external payable {
-        require(cardToOwner[_cardId] == msg.sender || cardApprovals[_cardId] == msg.sender);
-        _transfer(_from, _to, _cardId);
-    }
-
-    function approve(address _approved, uint _cardId) override external payable {
+    function itemApprove(address _approved, uint _cardId) override external payable {
         require(cardToOwner[_cardId] == msg.sender);
-        cardApprovals[_cardId] = _approved;
-        emit Approval(msg.sender, _approved, _cardId);
+        _cardApprovals[_cardId] = _approved;
+        emit ItemApproval(msg.sender, _approved, _cardId);
     }
 
-    function _transfer(address _from, address _to, uint _cardId) private {
+    function itemTransferFrom(address _from, address _to, uint _cardId) override external payable {
+        require(cardToOwner[_cardId] == msg.sender || _cardApprovals[_cardId] == msg.sender);
+        _itemTransfer(_from, _to, _cardId);
+    }
+
+    function _itemTransfer(address _from, address _to, uint _cardId) internal {
         ownerCardCount[_to] = ownerCardCount[_to]++;
         ownerCardCount[msg.sender] = ownerCardCount[msg.sender]--;
         cardToOwner[_cardId] = _to;
-        emit Transfer(_from, _to, _cardId);
+        emit ItemTransfer(_from, _to, _cardId);
     }
 }

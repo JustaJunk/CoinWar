@@ -1,12 +1,12 @@
-// JustaDual.sol
+// JustaDuel.sol
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./DualTokenSystem.sol";
+import "./DuelTokenSystem.sol";
 
-contract JustaDual is DualTokenSystem {
+contract JustaDuel is DuelTokenSystem {
 
-	event DualResult(address indexed _winner, address indexed _loser, int _gain);
+	event DuelResult(address indexed _winner, address indexed _loser, int _gain);
 	uint private _noneCardId = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 	uint public waitRoomCount;
 
@@ -15,7 +15,7 @@ contract JustaDual is DualTokenSystem {
 	mapping (uint => bool) public roomIdFinished;
 	mapping (address => uint) public playerWinCount;
 
-	constructor() DualTokenSystem() {
+	constructor() DuelTokenSystem() {
 		waitRoomCount = 0;
 	}
 
@@ -34,28 +34,28 @@ contract JustaDual is DualTokenSystem {
 		_;
 	}
 
-	function makeDual(uint[5] calldata _cardIds) external checkCardIds(_cardIds) {
+	function makeDuel(uint[5] calldata _cardIds) external checkCardIds(_cardIds) {
 		_waitRoom.push(_cardIds);
 		roomIdToPlayer[waitRoomCount] = msg.sender;
 		roomIdFinished[waitRoomCount] = false;
 		waitRoomCount += 1;
 	}
 
-	function takeDual(uint _roomId, uint[5] calldata _cardIds) external checkCardIds(_cardIds) {
+	function takeDuel(uint _roomId, uint[5] calldata _cardIds) external checkCardIds(_cardIds) {
 		require(!roomIdFinished[_roomId]);
 		address maker = roomIdToPlayer[_roomId];
-		int gain = _dual(_cardIds, _waitRoom[_roomId]);
+		int gain = _duel(_cardIds, _waitRoom[_roomId]);
 		if (gain > 0) {
 			playerWinCount[msg.sender] += 1;
-			emit DualResult(msg.sender, maker, gain);
+			emit DuelResult(msg.sender, maker, gain);
 		}
 		else {
 			playerWinCount[maker] += 1;
-			emit DualResult(maker, msg.sender, -gain);
+			emit DuelResult(maker, msg.sender, -gain);
 		}
 	}
 
-	function _dual(uint[5] calldata _takerCardIds,
+	function _duel(uint[5] calldata _takerCardIds,
 				   uint[5] storage _makerCardIds) private view returns (int){
 
 		int[5] memory takerPowers;

@@ -1,2 +1,2 @@
-# JustaDual
+# CryptoDual
 Ethereum game (for ChainLink hackathon)

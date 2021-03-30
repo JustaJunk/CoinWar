@@ -13,8 +13,8 @@ contract CardFactory {
     AggregatorV3Interface private priceFeedUNI;
     AggregatorV3Interface private priceFeedCOMP;
     
-    event NewSeed(uint seedId, CoinType coinType, int price);
-    event NewCard(uint cardId, CoinType coinType, int seedPrice, int nowPrice, int power);
+    event NewSeed(uint indexed seedId, CoinType indexed coinType, int price);
+    event NewCard(uint indexed cardId, CoinType indexed coinType, int seedPrice, int nowPrice, int power);
     
     int private significand = 1000;
     uint public nowSeedId;

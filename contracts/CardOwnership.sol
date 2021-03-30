@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./CardFactory.sol";
-import "./ERC721.sol";
+import "./CardDisplay.sol";
+import "../interfaces/ERC721.sol";
 
-contract CardOwnership is CardFactory, ERC721 {
+contract CardOwnership is CardDisplay, ERC721 {
     
     mapping (uint => address) cardApprovals;
 
@@ -17,13 +17,6 @@ contract CardOwnership is CardFactory, ERC721 {
         return cardToOwner[_cardId];
     }
 
-    function _transfer(address _from, address _to, uint _cardId) private {
-        ownerCardCount[_to] = ownerCardCount[_to]++;
-        ownerCardCount[msg.sender] = ownerCardCount[msg.sender]--;
-        cardToOwner[_cardId] = _to;
-        emit Transfer(_from, _to, _cardId);
-    }
-
     function transferFrom(address _from, address _to, uint _cardId) override external payable {
         require(cardToOwner[_cardId] == msg.sender || cardApprovals[_cardId] == msg.sender);
         _transfer(_from, _to, _cardId);
@@ -33,5 +26,12 @@ contract CardOwnership is CardFactory, ERC721 {
         require(cardToOwner[_cardId] == msg.sender);
         cardApprovals[_cardId] = _approved;
         emit Approval(msg.sender, _approved, _cardId);
+    }
+
+    function _transfer(address _from, address _to, uint _cardId) private {
+        ownerCardCount[_to] = ownerCardCount[_to]++;
+        ownerCardCount[msg.sender] = ownerCardCount[msg.sender]--;
+        cardToOwner[_cardId] = _to;
+        emit Transfer(_from, _to, _cardId);
     }
 }

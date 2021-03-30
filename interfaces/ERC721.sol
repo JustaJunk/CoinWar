@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 interface ERC721 {
+	
     event Transfer(address indexed _from, address indexed _to, uint indexed _cardId);
     event Approval(address indexed _owner, address indexed _approved, uint indexed _cardId);
 

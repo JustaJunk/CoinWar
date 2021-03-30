@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./CardOwnership.sol";
+import "./CardFactory.sol";
 
-contract CardDisplay is CardOwnership {
+contract CardDisplay is CardFactory {
 
     function getSeedsByOwner(address _owner) external view returns(uint[] memory) {
         uint[] memory seedList = new uint[](ownerSeedCount[_owner]);

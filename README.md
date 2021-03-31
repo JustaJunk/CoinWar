@@ -34,14 +34,11 @@ ETH0 | LINK | UNI | COMP | ETH1
 -|-|-|-|-
 
 Different type of card has different effect.  
-### ETH0
-Basic power  
-### LINK
-Add ETH1 power to basic power with a ratio associated with your LINK power.  
-### UNI
-Swap ETH0 if your UNI power larger than opponent's ETH0 power.  
-### COMP
-Borrow ETH1 power from opponent with a ratio associated with your COMP power.  
+0. **ETH0**: Basic power  
+1. **LINK**: ETH1 power to basic power with a ratio associated with your LINK power.  
+2. **UNI**: Swap ETH0 if your UNI power larger than opponent's ETH0 power.  
+3. **COMP**: Borrow ETH1 power from opponent with a ratio associated with your COMP power.  
+4. **ETH1**: Link by LINK card.
 
 ---
 ## TODO list

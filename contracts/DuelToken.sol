@@ -11,9 +11,9 @@ contract DuelToken is CardOwnership {
 	mapping (address => uint) private _tokenBalances;
 	mapping (address => mapping(address => uint)) private _tokenAllowances;
 
-	constructor(uint _initalStorage) {
-        _totalSupply = _initalStorage;
-		_tokenBalances[address(this)] = _initalStorage;
+	constructor(uint _initalSupply) {
+        _totalSupply = _initalSupply;
+		_tokenBalances[msg.sender] = _initalSupply;
 	}
 
 	function tokenTotalSupply() override external view returns (uint) {
@@ -69,9 +69,8 @@ contract DuelToken is CardOwnership {
        	if (systemStorage < _amount) {
        		_amount = systemStorage;
        	}
-        _totalSupply += _amount;
         _tokenBalances[_account] += _amount;
-        _tokenBalances[address(this)] -= _amount;
+        _totalSupply += _amount;
 
         emit TokenTransfer(address(this), _account, _amount);
     }

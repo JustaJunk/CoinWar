@@ -13,12 +13,15 @@ contract DuelTokenSystem is DuelToken {
 
 	function MintTokenByCard(uint _cardId) external {
 		require(msg.sender == cardToOwner[_cardId]);
-		uint value = uint(cards[_cardId].power);
+		int value = cards[_cardId].power;
 		require(value >= 0);
+		uint gain = uint(value);
 		_itemTransfer(msg.sender, address(0), _cardId);
-		_tokenMint(msg.sender, value);
+		delete cards[_cardId];
+		_tokenMint(msg.sender, gain);
+		ownerCardCount[msg.sender] -= 1;
 
-		emit MintToken(_cardId, value);
+		emit MintToken(_cardId, gain);
 	}
 
 	function TurnCardPower(uint _cardId) external {

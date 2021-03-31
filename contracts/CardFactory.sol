@@ -70,6 +70,7 @@ contract CardFactory {
         emit NewCard(cardCount, _coinType, seedPrice, _price, power);
         cardCount += 1;
         ownerCardCount[msg.sender] += 1;
+        ownerSeedCount[msg.sender] -= 1;
     }
 
     function plantSeedETH() public {

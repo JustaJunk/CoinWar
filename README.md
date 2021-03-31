@@ -6,7 +6,7 @@ Inspired by yu-gi-oh (a classic anime)
 
 ---
 ## Summary
-Print your own cards according to the price change of coins (using Chainlink pricefeed oracle) instead of randomness. You'll get powerful cards if you're good at price prediction. Different type of cards (ETH, LINK, UNI, COMP) cause different effects. Then you can duel with others using your self-printed card. Your can earn tokens by winning the duel or burn your cards (mint). You can also burn token to enhance your card (forge).
+Print your own cards according to the price change of coins (using Chainlink price-feed oracle) instead of randomness. You'll get powerful cards if you're good at price prediction. Different type of cards (ETH, LINK, UNI, COMP) cause different effects. Then you can duel with others using your self-printed cards. Your can earn tokens by winning the duel or burn your cards (mint). You can also burn token to enhance your card (forge).
 
 ---
 ## Plant Seed & Print Card
@@ -28,7 +28,11 @@ The more powerful card your burn, the more token you'll get.
 ---
 ## Duel
 Arrange yor card (at most 5) and duel with others.  
-This is your card slot look like: | ETH0 | LINK | UNI | COMP | ETH1 |  
+This is your card slot look like:  
+
+ETH0 | LINK | UNI | COMP | ETH1
+-|-|-|-|-
+
 Different type of card has different effect.  
 ### ETH0
 Basic power  

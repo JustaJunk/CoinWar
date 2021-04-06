@@ -47,7 +47,7 @@ contract CardFactory {
         priceFeedCOMP = AggregatorV3Interface(0xECF93D14d25E02bA2C13698eeDca9aA98348EFb6);
     }
     
-    modifier checkBase(uint _seedId, CoinType _coinType) {
+    modifier checkSeed(uint _seedId, CoinType _coinType) {
         require(seedToOwner[_seedId] == msg.sender);
         require(seeds[_seedId].coinType == _coinType);
         _;
@@ -78,7 +78,7 @@ contract CardFactory {
         _plantSeed(CoinType.ETH, basePrice);
     }
     
-    function printCardETH(uint _seedId) public checkBase(_seedId, CoinType.ETH) {
+    function printCardETH(uint _seedId) public checkSeed (_seedId, CoinType.ETH) {
         (,int nowPrice,,,) = priceFeedETH.latestRoundData();
         _printCard(CoinType.ETH, _seedId, nowPrice);
     }
@@ -88,7 +88,7 @@ contract CardFactory {
         _plantSeed(CoinType.LINK, basePrice);
     }
     
-    function printCardLINK(uint _seedId) public checkBase(_seedId, CoinType.LINK) {
+    function printCardLINK(uint _seedId) public checkSeed (_seedId, CoinType.LINK) {
         (,int nowPrice,,,) = priceFeedLINK.latestRoundData();
         _printCard(CoinType.LINK, _seedId, nowPrice);
     }
@@ -98,7 +98,7 @@ contract CardFactory {
         _plantSeed(CoinType.UNI, basePrice);
     }
     
-    function printCardUNI(uint _seedId) public checkBase(_seedId, CoinType.UNI) {
+    function printCardUNI(uint _seedId) public checkSeed (_seedId, CoinType.UNI) {
         (,int nowPrice,,,) = priceFeedUNI.latestRoundData();
         _printCard(CoinType.UNI, _seedId, nowPrice);
     }
@@ -108,7 +108,7 @@ contract CardFactory {
         _plantSeed(CoinType.COMP, basePrice);
     }
     
-    function printCardCOMP(uint _seedId) public checkBase(_seedId, CoinType.COMP) {
+    function printCardCOMP(uint _seedId) public checkSeed (_seedId, CoinType.COMP) {
         (,int nowPrice,,,) = priceFeedCOMP.latestRoundData();
         _printCard(CoinType.COMP, _seedId, nowPrice);
     }

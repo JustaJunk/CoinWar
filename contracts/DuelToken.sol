@@ -3,93 +3,85 @@
 pragma solidity ^0.8.0;
 
 import "./CardOwnership.sol";
+import "../interfaces/ERC20.sol";
 
-contract DuelToken is CardOwnership {
+contract DuelToken is CardOwnership, ERC20 {
 
     uint private _totalSupply;
 
-	mapping (address => uint) private _tokenBalances;
-	mapping (address => mapping(address => uint)) private _tokenAllowances;
+    mapping (address => uint) private _balances;
+    mapping (address => mapping(address => uint)) private _allowances;
 
-	constructor(uint _initalSupply) {
+    constructor(uint _initalSupply) {
         _totalSupply = _initalSupply;
-		_tokenBalances[msg.sender] = _initalSupply;
-	}
-
-	function tokenTotalSupply() override external view returns (uint) {
-		return _totalSupply;
-	}
-
-    function tokenSystemStorage() external view returns (uint) {
-        return _tokenBalances[address(this)];
+        _balances[msg.sender] = _initalSupply;
     }
 
-	function tokenBalanceOf(address _account) override external view returns (uint) {
-		return _tokenBalances[_account];
-	}
+    function totalSupply() override external view returns (uint) {
+        return _totalSupply;
+    }
 
-	function tokenTransfer(address _recipient, uint _amount) override external returns (bool) {
-		_tokenTransfer(msg.sender, _recipient, _amount);
-		return true;
-	}
+    function balanceOf(address _account) override external view returns (uint) {
+        return _balances[_account];
+    }
 
-	function tokenAllowance(address _owner, address _spender) override external view returns (uint) {
-		return _tokenAllowances[_owner][_spender];
-	}
-
-    function tokenApprove(address _spender, uint _amount) override external returns (bool) {
-        _tokenApprove(msg.sender, _spender, _amount);
+    function transfer(address _recipient, uint _amount) override external returns (bool) {
+        _transfer(msg.sender, _recipient, _amount);
         return true;
     }
 
-    function tokenTransferFrom(address _sender, address _recipient, uint _amount) override external returns (bool) {
-        _tokenTransfer(_sender, _recipient, _amount);
+    function allowance(address _owner, address _spender) override external view returns (uint) {
+        return _allowances[_owner][_spender];
+    }
 
-        uint currentAllowance = _tokenAllowances[_sender][msg.sender];
+    function approve(address _spender, uint _amount) override external returns (bool) {
+        _approve(msg.sender, _spender, _amount);
+        return true;
+    }
+
+    function transferFrom(address _sender, address _recipient, uint _amount) override external returns (bool) {
+        _transfer(_sender, _recipient, _amount);
+
+        uint currentAllowance = _allowances[_sender][msg.sender];
         require(currentAllowance >= _amount);
-        _tokenApprove(_sender, msg.sender, currentAllowance - _amount);
+        _approve(_sender, msg.sender, currentAllowance - _amount);
 
         return true;
     }
 
-	function _tokenTransfer(address _sender, address _recipient, uint _amount) internal {
-		require(_sender != address(0));
+    function _transfer(address _sender, address _recipient, uint _amount) internal {
+        require(_sender != address(0));
         require(_recipient != address(0));
-        uint senderBalance = _tokenBalances[_sender];
-        _tokenBalances[_sender] = senderBalance - _amount;
-        _tokenBalances[_recipient] += _amount;
+        uint senderBalance = _balances[_sender];
+        _balances[_sender] = senderBalance - _amount;
+        _balances[_recipient] += _amount;
 
-        emit TokenTransfer(_sender, _recipient, _amount);
-	}
+        emit Transfer(_sender, _recipient, _amount);
+    }
 
-    function _tokenMint(address _account, uint _amount) internal {
+    function _mint(address _account, uint _amount) internal {
         require(_account != address(0));
-        uint systemStorage = _tokenBalances[address(this)];
-        require(systemStorage > 0);
-       	if (systemStorage < _amount) {
-       		_amount = systemStorage;
-       	}
-        _tokenBalances[_account] += _amount;
+        _balances[_account] += _amount;
         _totalSupply += _amount;
 
-        emit TokenTransfer(address(this), _account, _amount);
+        emit Transfer(address(0), _account, _amount);
     }
 
-    function _tokenBurn(address _account, uint _amount) internal {
+    function _burn(address _account, uint _amount) internal {
         require(_account != address(0));
-        uint accountBalance = _tokenBalances[_account];
+        uint accountBalance = _balances[_account];
         require(accountBalance >= _amount);
-        _tokenBalances[_account] = accountBalance - _amount;
+        _balances[_account] = accountBalance - _amount;
         _totalSupply -= _amount;
 
-        emit TokenTransfer(_account, address(this), _amount);
+        emit Transfer(_account, address(0), _amount);
     }
 
-    function _tokenApprove(address _owner, address _spender, uint _amount) internal {
+    function _approve(address _owner, address _spender, uint _amount) internal {
         require(_owner != address(0));
         require(_spender != address(0));
-        _tokenAllowances[_owner][_spender] = _amount;
+        _allowances[_owner][_spender] = _amount;
 
-        emit TokenApproval(_owner, _spender, _amount);
+        emit Approval(_owner, _spender, _amount);
     }
 }

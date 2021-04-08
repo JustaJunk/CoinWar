@@ -1,4 +1,14 @@
 compiler:
-    solc:
-        remappings:
-          - "@chainlink=smartcontractkit/chainlink-brownie-contracts@1.0.2"
+  solc:
+    remappings:
+      - "@chainlink=alphachainio/chainlink-contracts@1.1.2"
+
+dependencies:
+  - alphachainio/chainlink-contracts@1.1.2
+
+networks:
+  default: kovan
+  kovan:
+    link_token: '0xa36085f69e2889c224210f603d836748e7dc0088'
+wallets:
+  from_key: PRIVATE_KEY

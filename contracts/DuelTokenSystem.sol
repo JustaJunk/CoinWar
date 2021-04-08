@@ -2,14 +2,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./CardOwnership.sol";
 import "./DuelToken.sol";
 
-contract DuelTokenSystem is DuelToken {
+contract DuelTokenSystem is CardOwnership, DuelToken {
 
     event MintToken(uint indexed _cardId, uint _value);
     event TurnCard(uint indexed _cardId, int _power);
 
-    constructor() DuelToken(77777777777777) {}
+    constructor(
+        address _ethAggregatorAddress,
+        address _linkAggregatorAddress,
+        address _uniAggregatorAddress,
+        address _compAggregatorAddress,
+        uint _initalSupply)
+        CardOwnership(
+            _ethAggregatorAddress,
+            _linkAggregatorAddress,
+            _uniAggregatorAddress,
+            _compAggregatorAddress) 
+        DuelToken(_initalSupply)
+    {
+    }
 
     function MintTokenByCard(uint _cardId) external {
         require(msg.sender == cardToOwner[_cardId]);

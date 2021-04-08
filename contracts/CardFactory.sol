@@ -38,13 +38,17 @@ contract CardFactory {
     mapping (address => uint) internal ownerSeedCount;
     mapping (address => uint) internal ownerCardCount;
 
-    constructor() {
+    constructor(
+        address _ethAggregatorAddress,
+        address _linkAggregatorAddress,
+        address _uniAggregatorAddress,
+        address _compAggregatorAddress) {
         seedCount = 0;
         cardCount = 0;
-        priceFeedETH = AggregatorV3Interface(0x9326BFA02ADD2366b30bacB125260Af641031331);
-        priceFeedLINK = AggregatorV3Interface(0x396c5E36DD0a0F5a5D33dae44368D4193f69a1F0);
-        priceFeedUNI = AggregatorV3Interface(0xDA5904BdBfB4EF12a3955aEcA103F51dc87c7C39);
-        priceFeedCOMP = AggregatorV3Interface(0xECF93D14d25E02bA2C13698eeDca9aA98348EFb6);
+        priceFeedETH = AggregatorV3Interface(_ethAggregatorAddress);
+        priceFeedLINK = AggregatorV3Interface(_linkAggregatorAddress);
+        priceFeedUNI = AggregatorV3Interface(_uniAggregatorAddress);
+        priceFeedCOMP = AggregatorV3Interface(_compAggregatorAddress);
     }
     
     modifier checkSeed(uint _seedId, CoinType _coinType) {

@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./CardOwnership.sol";
 import "../interfaces/ERC20.sol";
 
-contract DuelToken is CardOwnership, ERC20 {
+contract DuelToken is ERC20 {
 
     uint private _totalSupply;
 

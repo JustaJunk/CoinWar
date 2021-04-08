@@ -15,7 +15,19 @@ contract JustaDuel is DuelTokenSystem {
     mapping (uint => bool) public roomIdFinished;
     mapping (address => uint) public playerWinCount;
 
-    constructor() DuelTokenSystem() {
+    constructor(
+        address _ethAggregatorAddress,
+        address _linkAggregatorAddress,
+        address _uniAggregatorAddress,
+        address _compAggregatorAddress,
+        uint _initalSupply)
+        DuelTokenSystem(
+            _ethAggregatorAddress,
+            _linkAggregatorAddress,
+            _uniAggregatorAddress,
+            _compAggregatorAddress,
+            _initalSupply)
+    {
         waitRoomCount = 0;
     }
 

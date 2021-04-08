@@ -1,14 +1,20 @@
+dependencies:
+  - smartcontractkit/chainlink-brownie-contracts@1.0.2
 compiler:
   solc:
     remappings:
-      - "@chainlink=alphachainio/chainlink-contracts@1.1.2"
+      - '@chainlink=smartcontractkit/chainlink-brownie-contracts@1.0.2'
 
-dependencies:
-  - alphachainio/chainlink-contracts@1.1.2
-
+# automatically fetch contract sources from Etherscan
+autofetch_sources: True
+# Change to trye to verify smart contracts
+verify: False
+# set a custom mnemonic for the development network
 networks:
-  default: kovan
+  default: development
   kovan:
     link_token: '0xa36085f69e2889c224210f603d836748e7dc0088'
+
+# wallets
 wallets:
   from_key: PRIVATE_KEY

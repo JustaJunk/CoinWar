@@ -38,17 +38,13 @@ contract CardFactory {
     mapping (address => uint) internal ownerSeedCount;
     mapping (address => uint) internal ownerCardCount;
 
-    constructor(
-        address _ethAggregatorAddress,
-        address _linkAggregatorAddress,
-        address _uniAggregatorAddress,
-        address _compAggregatorAddress) {
+    constructor(address[4] memory _aggregatorAddresses) {
         seedCount = 0;
         cardCount = 0;
-        priceFeedETH = AggregatorV3Interface(_ethAggregatorAddress);
-        priceFeedLINK = AggregatorV3Interface(_linkAggregatorAddress);
-        priceFeedUNI = AggregatorV3Interface(_uniAggregatorAddress);
-        priceFeedCOMP = AggregatorV3Interface(_compAggregatorAddress);
+        priceFeedETH = AggregatorV3Interface(_aggregatorAddresses[0]);
+        priceFeedLINK = AggregatorV3Interface(_aggregatorAddresses[1]);
+        priceFeedUNI = AggregatorV3Interface(_aggregatorAddresses[2]);
+        priceFeedCOMP = AggregatorV3Interface(_aggregatorAddresses[3]);
     }
     
     modifier checkSeed(uint _seedId, CoinType _coinType) {
@@ -60,9 +56,10 @@ contract CardFactory {
     function _plantSeed(CoinType _coinType, int _price) private {
         seeds.push(Seed(_coinType, _price));
         seedToOwner[seedCount] = msg.sender;
+        ownerSeedCount[msg.sender] += 1;
+
         emit NewSeed(seedCount, _coinType, _price);
         seedCount += 1;
-        ownerSeedCount[msg.sender] += 1;
     }  
 
     function _printCard(CoinType _coinType, uint _seedId, int _price) private {
@@ -71,10 +68,11 @@ contract CardFactory {
         cards.push(Card(_coinType, power));
         cardToOwner[cardCount] = msg.sender;
         seedToOwner[_seedId] = address(0);
-        emit NewCard(cardCount, _coinType, seedPrice, _price, power);
-        cardCount += 1;
         ownerCardCount[msg.sender] += 1;
         ownerSeedCount[msg.sender] -= 1;
+
+        emit NewCard(cardCount, _coinType, seedPrice, _price, power);
+        cardCount += 1;
     }
 
     function plantSeedETH() public {

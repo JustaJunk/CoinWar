@@ -11,18 +11,11 @@ contract CardSystem is CardOwnership, ERC20 {
     event TurnCard(uint indexed _cardId, int _power);
 
     constructor(
-        address _ethAggregatorAddress,
-        address _linkAggregatorAddress,
-        address _uniAggregatorAddress,
-        address _compAggregatorAddress,
+        address[4] memory _aggregatorAddresses,
         string memory _name,
         string memory _symbol,
         uint _initalSupply)
-        CardOwnership(
-            _ethAggregatorAddress,
-            _linkAggregatorAddress,
-            _uniAggregatorAddress,
-            _compAggregatorAddress) 
+        CardOwnership(_aggregatorAddresses) 
         ERC20(_name, _symbol)
     {
         _mint(msg.sender, _initalSupply);

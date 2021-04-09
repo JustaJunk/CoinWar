@@ -9,16 +9,8 @@ contract CardOwnership is CardFactory, ERC721Card {
     
     mapping (uint => address) private _cardApprovals;
 
-    constructor(
-        address _ethAggregatorAddress,
-        address _linkAggregatorAddress,
-        address _uniAggregatorAddress,
-        address _compAggregatorAddress) 
-        CardFactory(
-            _ethAggregatorAddress,
-            _linkAggregatorAddress,
-            _uniAggregatorAddress,
-            _compAggregatorAddress)
+    constructor(address[4] memory _aggregatorAddresses) 
+        CardFactory(_aggregatorAddresses)
     {
     }
 
@@ -51,7 +43,7 @@ contract CardOwnership is CardFactory, ERC721Card {
     function getSeedsByOwner(address _owner) external view returns(uint[] memory) {
         uint[] memory seedList = new uint[](ownerSeedCount[_owner]);
         uint counter = 0;
-        for (uint i = 0; i < cards.length; i++) {
+        for (uint i = 0; i < seeds.length; i++) {
             if (seedToOwner[i] == _owner) {
                 seedList[counter] = i;
                 counter++;

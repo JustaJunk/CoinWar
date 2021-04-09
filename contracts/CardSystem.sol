@@ -1,11 +1,11 @@
-// DuelTokenSystem.sol
+// CardSystem.sol
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "./CardOwnership.sol";
-import "./DuelToken.sol";
+import "@OpenZeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract DuelTokenSystem is CardOwnership, DuelToken {
+contract CardSystem is CardOwnership, ERC20 {
 
     event MintToken(uint indexed _cardId, uint _value);
     event TurnCard(uint indexed _cardId, int _power);
@@ -15,14 +15,17 @@ contract DuelTokenSystem is CardOwnership, DuelToken {
         address _linkAggregatorAddress,
         address _uniAggregatorAddress,
         address _compAggregatorAddress,
+        string memory _name,
+        string memory _symbol,
         uint _initalSupply)
         CardOwnership(
             _ethAggregatorAddress,
             _linkAggregatorAddress,
             _uniAggregatorAddress,
             _compAggregatorAddress) 
-        DuelToken(_initalSupply)
+        ERC20(_name, _symbol)
     {
+        _mint(msg.sender, _initalSupply);
     }
 
     function MintTokenByCard(uint _cardId) external {

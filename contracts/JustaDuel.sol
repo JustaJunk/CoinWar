@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./DuelTokenSystem.sol";
+import "./CardSystem.sol";
 
-contract JustaDuel is DuelTokenSystem {
+contract JustaDuel is CardSystem {
 
     event DuelResult(address indexed _winner, address indexed _loser, int _gain);
     uint private _noneCardId = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
@@ -20,12 +20,16 @@ contract JustaDuel is DuelTokenSystem {
         address _linkAggregatorAddress,
         address _uniAggregatorAddress,
         address _compAggregatorAddress,
+        string memory _name,
+        string memory _symbol,
         uint _initalSupply)
-        DuelTokenSystem(
+        CardSystem(
             _ethAggregatorAddress,
             _linkAggregatorAddress,
             _uniAggregatorAddress,
             _compAggregatorAddress,
+            _name,
+            _symbol,
             _initalSupply)
     {
         waitRoomCount = 0;

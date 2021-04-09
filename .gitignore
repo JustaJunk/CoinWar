@@ -5,3 +5,4 @@ build/
 reports/
 
 .env
+.pytest_cache

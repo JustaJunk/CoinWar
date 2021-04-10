@@ -28,10 +28,10 @@ contract DuelPoints is ERC20, Ownable {
     }
 
     function mint(address who, uint amount) external onlyDuelCard {
-        _mint(who, amount);
+        _mint(who, amount*10**decimals());
     }
 
     function burn(address who, uint amount) external onlyDuelCard {
-        _burn(who, amount);
+        _burn(who, amount*10**decimals());
     }
 }

@@ -3,115 +3,97 @@
 pragma solidity ^0.8.0;
 
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
+import "@OpenZeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract CardFactory {
+contract CardFactory is ERC721 {
  
-    enum CoinType{ETH, LINK, UNI, COMP}
-   
-    AggregatorV3Interface private priceFeedETH;
-    AggregatorV3Interface private priceFeedLINK;
-    AggregatorV3Interface private priceFeedUNI;
-    AggregatorV3Interface private priceFeedCOMP;
-    
-    event NewSeed(uint indexed seedId, CoinType indexed coinType, int price);
-    event NewCard(uint indexed cardId, CoinType indexed coinType, int seedPrice, int nowPrice, int power);
-    
-    int private significand = 1000;
-    uint public seedCount;
-    uint public cardCount;
-    
     struct Seed {
-        CoinType    coinType;
+        address     aggAddress;
         int         price;
+        bool        isLong;
+        uint        timeStamp;
     }
 
     struct Card {
-        CoinType    coinType;
+        address     aggAddress;
         int         power;
+        uint        interval;
     }
+
+    event NewSeed(uint indexed seedId, address indexed aggAddress, int price, bool isLong);
+    event NewCard(uint indexed cardId, address indexed aggAddress, int power, uint interval);
     
+    uint public seedCounter;
+    uint public cardCounter;
+      
     Seed[] public seeds;
     Card[] public cards;
   
     mapping (uint => address) public seedToOwner;
-    mapping (uint => address) public cardToOwner;
     mapping (address => uint) internal ownerSeedCount;
-    mapping (address => uint) internal ownerCardCount;
 
-    constructor(address[4] memory _aggregatorAddresses) {
-        seedCount = 0;
-        cardCount = 0;
-        priceFeedETH = AggregatorV3Interface(_aggregatorAddresses[0]);
-        priceFeedLINK = AggregatorV3Interface(_aggregatorAddresses[1]);
-        priceFeedUNI = AggregatorV3Interface(_aggregatorAddresses[2]);
-        priceFeedCOMP = AggregatorV3Interface(_aggregatorAddresses[3]);
-    }
-    
-    modifier checkSeed(uint _seedId, CoinType _coinType) {
-        require(seedToOwner[_seedId] == msg.sender);
-        require(seeds[_seedId].coinType == _coinType);
-        _;
+
+    constructor(string memory name_, string memory symbol_)
+        ERC721(name_, symbol_) {
+        seedCounter = 0;
+        cardCounter = 0;
     }
 
-    function _plantSeed(CoinType _coinType, int _price) private {
-        seeds.push(Seed(_coinType, _price));
-        seedToOwner[seedCount] = msg.sender;
+    function plantSeed(address aggAddress_, bool isLong_) public {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(aggAddress_);
+        (,int price,,uint timeStamp,) = priceFeed.latestRoundData();
+        seeds.push(Seed(aggAddress_, price, isLong_, timeStamp));
+        seedToOwner[seedCounter] = msg.sender;
         ownerSeedCount[msg.sender] += 1;
 
-        emit NewSeed(seedCount, _coinType, _price);
-        seedCount += 1;
-    }  
+        emit NewSeed(seedCounter, aggAddress_, price, isLong_);
+        seedCounter += 1;
+    }
+    
+    function printCard(address aggAddress_, uint seedId_) public {
+        require(seedToOwner[seedId_] == msg.sender);
+        require(seeds[seedId_].aggAddress == aggAddress_);
 
-    function _printCard(CoinType _coinType, uint _seedId, int _price) private {
-        int seedPrice = seeds[_seedId].price; 
-        int power = _price*significand/seedPrice - significand;
-        cards.push(Card(_coinType, power));
-        cardToOwner[cardCount] = msg.sender;
-        seedToOwner[_seedId] = address(0);
-        ownerCardCount[msg.sender] += 1;
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(aggAddress_);
+        (,int price,,uint timeStamp,) = priceFeed.latestRoundData();
+        int power;
+        if (seeds[seedId_].isLong) {
+            power = price*1000/seeds[seedId_].price - 1000;
+        }
+        else {
+            power = 1000 - price*1000/seeds[seedId_].price;
+        }
+        uint interval = timeStamp - seeds[seedId_].timeStamp;
+        cards.push(Card(aggAddress_, power, interval));
+        _mint(msg.sender, cardCounter);
+        seedToOwner[seedId_] = address(0);
         ownerSeedCount[msg.sender] -= 1;
 
-        emit NewCard(cardCount, _coinType, seedPrice, _price, power);
-        cardCount += 1;
+        emit NewCard(cardCounter, aggAddress_, power, interval);
+        cardCounter += 1;
     }
 
-    function plantSeedETH() public {
-        (,int basePrice,,,) = priceFeedETH.latestRoundData();
-        _plantSeed(CoinType.ETH, basePrice);
-    }
-    
-    function printCardETH(uint _seedId) public checkSeed (_seedId, CoinType.ETH) {
-        (,int nowPrice,,,) = priceFeedETH.latestRoundData();
-        _printCard(CoinType.ETH, _seedId, nowPrice);
-    }
-
-    function plantSeedLINK() public {
-        (,int basePrice,,,) = priceFeedLINK.latestRoundData();
-        _plantSeed(CoinType.LINK, basePrice);
-    }
-    
-    function printCardLINK(uint _seedId) public checkSeed (_seedId, CoinType.LINK) {
-        (,int nowPrice,,,) = priceFeedLINK.latestRoundData();
-        _printCard(CoinType.LINK, _seedId, nowPrice);
+    function getSeedsByOwner(address owner_) external view returns(uint[] memory) {
+        uint[] memory seedList = new uint[](ownerSeedCount[owner_]);
+        uint counter = 0;
+        for (uint i = 0; i < seeds.length; i++) {
+            if (seedToOwner[i] == owner_) {
+                seedList[counter] = i;
+                counter++;
+            }
+        }
+        return seedList;
     }
 
-    function plantSeedUNI() public {
-        (,int basePrice,,,) = priceFeedUNI.latestRoundData();
-        _plantSeed(CoinType.UNI, basePrice);
-    }
-    
-    function printCardUNI(uint _seedId) public checkSeed (_seedId, CoinType.UNI) {
-        (,int nowPrice,,,) = priceFeedUNI.latestRoundData();
-        _printCard(CoinType.UNI, _seedId, nowPrice);
-    }
-
-    function plantSeedCOMP() public {
-        (,int basePrice,,,) = priceFeedCOMP.latestRoundData();
-        _plantSeed(CoinType.COMP, basePrice);
-    }
-    
-    function printCardCOMP(uint _seedId) public checkSeed (_seedId, CoinType.COMP) {
-        (,int nowPrice,,,) = priceFeedCOMP.latestRoundData();
-        _printCard(CoinType.COMP, _seedId, nowPrice);
+    function getCardsByOwner(address owner_) external view returns(uint[] memory) {
+        uint[] memory cardList = new uint[](balanceOf(owner_));
+        uint counter = 0;
+        for (uint i = 0; i < cards.length; i++) {
+            if (ownerOf(i) == owner_) {
+                cardList[counter] = i;
+                counter++;
+            }
+        }
+        return cardList;
     }
 }

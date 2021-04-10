@@ -10,15 +10,11 @@ contract CardSystem is CardOwnership, ERC20 {
     event MintToken(uint indexed _cardId, uint _value);
     event TurnCard(uint indexed _cardId, int _power);
 
-    constructor(
-        address[4] memory _aggregatorAddresses,
-        string memory _name,
-        string memory _symbol,
-        uint _initalSupply)
+    constructor(address[4] memory _aggregatorAddresses)
         CardOwnership(_aggregatorAddresses) 
-        ERC20(_name, _symbol)
+        ERC20("Duel Live Points", "DLP")
     {
-        _mint(msg.sender, _initalSupply);
+        _mint(msg.sender, 7777777e18);
     }
 
     function MintTokenByCard(uint _cardId) external {

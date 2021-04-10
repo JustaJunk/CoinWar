@@ -4,24 +4,14 @@ from brownie import CardSystem, MockV3Aggregator, accounts
 import brownie
 
 @pytest.fixture(scope="module")
-def deploy_card_system(
-    get_all_aggregator,
-    token_name, token_symbol, token_init_supply,
-    get_dev_account):
+def deploy_card_system(get_all_aggregator, get_dev_account):
 
     # Arrange
     price_feed_aggs, price_feed_addrs = get_all_aggregator
-    card_system = CardSystem.deploy(
-        price_feed_addrs,
-        token_name, token_symbol, token_init_supply,
-        {"from":get_dev_account})
+    card_system = CardSystem.deploy(price_feed_addrs, {"from":get_dev_account})
 
     # Assert
     assert card_system is not None
-    assert card_system.name() == token_name
-    assert card_system.symbol() == token_symbol
-    assert card_system.totalSupply() == token_init_supply
-    assert card_system.balanceOf(get_dev_account) == token_init_supply
     return card_system, price_feed_aggs
 
 ##################################################

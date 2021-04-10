@@ -15,16 +15,8 @@ contract JustaDuel is CardSystem {
     mapping (uint => bool) public roomIdFinished;
     mapping (address => uint) public playerWinCount;
 
-    constructor(
-        address[4] memory _aggregatorAddresses,
-        string memory _name,
-        string memory _symbol,
-        uint _initalSupply)
-        CardSystem(
-            _aggregatorAddresses,
-            _name,
-            _symbol,
-            _initalSupply)
+    constructor(address[4] memory _aggregatorAddresses)
+        CardSystem(_aggregatorAddresses)
     {
         waitRoomCount = 0;
     }

@@ -34,15 +34,3 @@ def get_dev_account():
     else:
         pytest.skip("Invalid network specified")
         return
-
-@pytest.fixture(scope="module")
-def token_name():
-    return "Duel Live Points"
-
-@pytest.fixture(scope="module")
-def token_symbol():
-    return "DLP"
-
-@pytest.fixture(scope="module")
-def token_init_supply():
-    return 77e27

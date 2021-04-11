@@ -4,8 +4,10 @@ pragma solidity ^0.8.0;
 
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 import "@OpenZeppelin/contracts/token/ERC721/ERC721.sol";
+import "@OpenZeppelin/contracts/access/Ownable.sol";
 
-contract CardFactory is ERC721 {
+
+contract CardFactory is ERC721, Ownable {
  
     struct Seed {
         address     aggAddress;
@@ -20,6 +22,7 @@ contract CardFactory is ERC721 {
         uint        interval;
     }
 
+
     event NewSeed(uint indexed seedId, address indexed aggAddress, int price, bool isLong);
     event NewCard(uint indexed cardId, address indexed aggAddress, int power, uint interval);
     
@@ -32,12 +35,20 @@ contract CardFactory is ERC721 {
     mapping (uint => address) public seedToOwner;
     mapping (address => uint) internal ownerSeedCount;
 
+    enum PairType {NONE, BASE, SWAP, LEND, LINK}
+    mapping (address => PairType) public aggAddressToType;
 
     constructor(string memory name_, string memory symbol_)
         ERC721(name_, symbol_) {
         seedCounter = 0;
         cardCounter = 0;
     }
+
+    function setAddressType(address aggAddress, PairType pairType) external onlyOwner {
+        require(aggAddressToType[aggAddress] == PairType.NONE,
+                "CardFactory: address have been set");
+        aggAddressToType[aggAddress] = pairType;
+    } 
 
     function plantSeed(address aggAddress_, bool isLong_) public {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(aggAddress_);
@@ -51,8 +62,10 @@ contract CardFactory is ERC721 {
     }
     
     function printCard(address aggAddress_, uint seedId_) public {
-        require(seedToOwner[seedId_] == msg.sender);
-        require(seeds[seedId_].aggAddress == aggAddress_);
+        require(seedToOwner[seedId_] == msg.sender,
+                "CardFactory: caller is not the owner of this seed");
+        require(seeds[seedId_].aggAddress == aggAddress_,
+                "CardFactory: aggregator address not match");
 
         AggregatorV3Interface priceFeed = AggregatorV3Interface(aggAddress_);
         (,int price,,uint timeStamp,) = priceFeed.latestRoundData();

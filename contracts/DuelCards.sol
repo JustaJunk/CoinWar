@@ -15,18 +15,22 @@ contract DuelCards is CardFactory {
     }
 
     function burnCard(uint cardId) external {
-        require(msg.sender == ownerOf(cardId));
+        require(msg.sender == ownerOf(cardId),
+                "DuelCards: caller is not the owner of this card");
         int value = cards[cardId].power;
-        require(value >= 0);
+        require(value >= 0,
+                "DuelCards: can only burn the card with positive power");
         uint gain = uint(value);
         _burn(cardId);
         duelPoints.mint(msg.sender, gain);
     }
 
     function turnCard(uint cardId) external {
-        require(msg.sender == ownerOf(cardId));
+        require(msg.sender == ownerOf(cardId),
+                "DuelCards: caller is not the owner of this card");
         int value = cards[cardId].power;
-        require(value < 0);
+        require(value < 0,
+                "DuelCards: can only turn the card with negative power");
         uint cost = uint(-value*2);
         duelPoints.burn(msg.sender, cost);
         cards[cardId].power = -value;

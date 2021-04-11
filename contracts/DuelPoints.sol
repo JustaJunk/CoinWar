@@ -7,24 +7,26 @@ import "@OpenZeppelin/contracts/access/Ownable.sol";
 
 contract DuelPoints is ERC20, Ownable {
 
-    bool public ifSetDuelCardAddress;
-    address public duelCardAddress;
+    bool public ifSetDuelCardsAddress;
+    address public duelCardsAddress;
 
     constructor() ERC20("Duel Points", "DuP") {
         _mint(msg.sender, 7777777e18);
-        ifSetDuelCardAddress = false;
-        duelCardAddress = address(0);
+        ifSetDuelCardsAddress = false;
+        duelCardsAddress = address(0);
     }
 
     modifier onlyDuelCard {
-        require(msg.sender == duelCardAddress, "DuelPoints: only call by DuelCards");
+        require(msg.sender == duelCardsAddress,
+                "DuelPoints: only call by DuelCards");
         _;
     }
 
-    function setDuelCardAddress(address duelCardAddress_) external onlyOwner {
-        require(!ifSetDuelCardAddress);
-        duelCardAddress = duelCardAddress_;
-        ifSetDuelCardAddress = true;
+    function setDuelCardsAddress(address duelCardsAddress_) external onlyOwner {
+        require(!ifSetDuelCardsAddress,
+                "DuelPoints: address of DuelCards have been set");
+        duelCardsAddress = duelCardsAddress_;
+        ifSetDuelCardsAddress = true;
     }
 
     function mint(address who, uint amount) external onlyDuelCard {

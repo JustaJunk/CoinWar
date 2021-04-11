@@ -9,3 +9,4 @@ reports/
 
 .idea/
 client/src/artifacts
+**.DS_Store

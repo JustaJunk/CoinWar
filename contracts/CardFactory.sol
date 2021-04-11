@@ -109,7 +109,7 @@ contract CardFactory is ERC721, Ownable {
         uint[] memory cardList = new uint[](balanceOf(owner));
         uint index = 0;
         for (uint i = 0; i < cardCounter; i++) {
-            if (ownerOf(i) == owner) {
+            if (_exists(i) && ownerOf(i) == owner) {
                 cardList[index] = i;
                 index++;
             }

@@ -46,5 +46,5 @@ def get_comp_usd_address():
 def main():
     return  [get_eth_usd_address(),
             get_uni_usd_address(),
-            get_link_usd_address(),
-            get_comp_usd_address()]
+            get_comp_usd_address(),
+            get_link_usd_address()]

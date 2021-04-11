@@ -7,6 +7,14 @@ compiler:
       - '@chainlink=smartcontractkit/chainlink-brownie-contracts@1.0.2'
       - '@OpenZeppelin=OpenZeppelin/openzeppelin-contracts@4.0.0'
 
+# exclude SafeMath when calculating test coverage
+reports:
+  exclude_contracts:
+    - ERC20
+    - ERC721
+    - Ownable
+    - MockV3Aggregator
+
 # automatically fetch contract sources from Etherscan
 autofetch_sources: True
 dotenv: .env

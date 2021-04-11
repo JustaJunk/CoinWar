@@ -6,3 +6,6 @@ reports/
 
 .env
 .pytest_cache
+
+.idea/
+client/src/artifacts

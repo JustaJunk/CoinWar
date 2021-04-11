@@ -1,9 +1,8 @@
-// DuelCards.sol
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "./CardFactory.sol";
-import "../interfaces/DuelPointsInterface.sol";
+import "./DuelPointsInterface.sol";
 import "@OpenZeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DuelCards is CardFactory {

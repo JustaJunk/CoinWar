@@ -2,7 +2,7 @@
 from brownie import (
     network, accounts, config,
     MockV3Aggregator,
-    CardFactory, DuelPoints, DuelCards)
+    CardFactory, DuelPoints, DuelCards, JustaDuel)
 
 def get_dev_account():
     if network.show_active() == "development":
@@ -36,9 +36,19 @@ def duel_cards():
     dup.setDuelCardsAddress(duc.address, {"from": dev})
     return duc, dup
 
+def justa_duel():
+    dev = get_dev_account()
+    dup = duel_points()
+    duc = JustaDuel.deploy(
+            dup.address,
+            {"from": dev},
+            publish_source=config["verify"])
+    dup.setDuelCardsAddress(duc.address, {"from": dev})
+    return duc, dup
+
 def main():
     dev = get_dev_account()
-    duc, dup = duel_cards()
+    duc, dup = justa_duel()
     if network.show_active() == "development":
         mocks = get_mocks(4)
         addrs = [mock.address for mock in mocks]

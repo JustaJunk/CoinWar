@@ -10,8 +10,8 @@ contract DuelCards is CardFactory {
 
     DuelPointsInterface internal duelPoints;
 
-    constructor(address duelPointsAddress_) CardFactory("Duel Cards", "DuC") {
-        duelPoints = DuelPointsInterface(duelPointsAddress_);
+    constructor(address duelPointsAddress) CardFactory("Duel Cards", "DuC") {
+        duelPoints = DuelPointsInterface(duelPointsAddress);
     }
 
     function burnCard(uint cardId) external {

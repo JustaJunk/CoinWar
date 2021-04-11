@@ -19,9 +19,9 @@ contract CardFactory is ERC721, Ownable {
     struct Card {
         address     aggAddress;
         int         power;
+        CardType    cardType;
         uint        interval;
     }
-
 
     event NewSeed(uint indexed seedId, address indexed aggAddress, int price, bool isLong);
     event NewCard(uint indexed cardId, address indexed aggAddress, int power, uint interval);
@@ -35,8 +35,8 @@ contract CardFactory is ERC721, Ownable {
     mapping (uint => address) public seedToOwner;
     mapping (address => uint) internal ownerSeedCount;
 
-    enum PairType {NONE, BASE, SWAP, LEND, LINK}
-    mapping (address => PairType) public aggAddressToType;
+    enum CardType {NONE, BASE, SWAP, LEND, LINK}
+    mapping (address => CardType) public aggAddressToType;
 
     constructor(string memory name_, string memory symbol_)
         ERC721(name_, symbol_) {
@@ -44,10 +44,10 @@ contract CardFactory is ERC721, Ownable {
         cardCounter = 0;
     }
 
-    function setAddressType(address aggAddress, PairType pairType) external onlyOwner {
-        require(aggAddressToType[aggAddress] == PairType.NONE,
+    function setAddressType(address aggAddress, CardType cardType) external onlyOwner {
+        require(aggAddressToType[aggAddress] == CardType.NONE,
                 "CardFactory: address have been set");
-        aggAddressToType[aggAddress] = pairType;
+        aggAddressToType[aggAddress] = cardType;
     } 
 
     function plantSeed(address aggAddress_, bool isLong_) public {
@@ -77,20 +77,21 @@ contract CardFactory is ERC721, Ownable {
             power = 1000 - price*1000/seeds[seedId_].price;
         }
         uint interval = timeStamp - seeds[seedId_].timeStamp;
-        cards.push(Card(aggAddress_, power, interval));
+        cards.push(Card(aggAddress_, power, aggAddressToType[aggAddress_], interval));
         _mint(msg.sender, cardCounter);
         seedToOwner[seedId_] = address(0);
+        delete seeds[seedId_];
         ownerSeedCount[msg.sender] -= 1;
 
         emit NewCard(cardCounter, aggAddress_, power, interval);
         cardCounter += 1;
     }
 
-    function getSeedsByOwner(address owner_) external view returns(uint[] memory) {
-        uint[] memory seedList = new uint[](ownerSeedCount[owner_]);
+    function getSeedsByOwner(address owner) external view returns(uint[] memory) {
+        uint[] memory seedList = new uint[](ownerSeedCount[owner]);
         uint counter = 0;
         for (uint i = 0; i < seeds.length; i++) {
-            if (seedToOwner[i] == owner_) {
+            if (seedToOwner[i] == owner) {
                 seedList[counter] = i;
                 counter++;
             }
@@ -98,11 +99,11 @@ contract CardFactory is ERC721, Ownable {
         return seedList;
     }
 
-    function getCardsByOwner(address owner_) external view returns(uint[] memory) {
-        uint[] memory cardList = new uint[](balanceOf(owner_));
+    function getCardsByOwner(address owner) external view returns(uint[] memory) {
+        uint[] memory cardList = new uint[](balanceOf(owner));
         uint counter = 0;
         for (uint i = 0; i < cards.length; i++) {
-            if (ownerOf(i) == owner_) {
+            if (ownerOf(i) == owner) {
                 cardList[counter] = i;
                 counter++;
             }

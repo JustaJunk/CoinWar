@@ -55,9 +55,9 @@ def main():
     elif network.show_active() in config["networks"]:
         mocks = None
         addrs = [config["networks"][network.show_active()]["eth_usd_price_feed"],
-                config["networks"][network.show_active()]["uni_usd_price_feed"],
-                config["networks"][network.show_active()]["comp_usd_price_feed"],
-                config["networks"][network.show_active()]["link_usd_price_feed"]]
+                 config["networks"][network.show_active()]["uni_usd_price_feed"],
+                 config["networks"][network.show_active()]["comp_usd_price_feed"],
+                 config["networks"][network.show_active()]["link_usd_price_feed"]]
     else:
         print("Invalid network to deploy")
         return

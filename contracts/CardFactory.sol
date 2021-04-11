@@ -50,7 +50,7 @@ contract CardFactory is ERC721, Ownable {
         aggAddressToType[aggAddress] = cardType;
     } 
 
-    function plantSeed(address aggAddress_, bool isLong_) public {
+    function plantSeed(address aggAddress_, bool isLong_) external {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(aggAddress_);
         (,int price,,uint timeStamp,) = priceFeed.latestRoundData();
         seeds.push(Seed(aggAddress_, price, isLong_, timeStamp));
@@ -61,13 +61,12 @@ contract CardFactory is ERC721, Ownable {
         seedCounter += 1;
     }
     
-    function printCard(address aggAddress_, uint seedId_) public {
+    function printCard(uint seedId_) external {
         require(seedToOwner[seedId_] == msg.sender,
                 "CardFactory: caller is not the owner of this seed");
-        require(seeds[seedId_].aggAddress == aggAddress_,
-                "CardFactory: aggregator address not match");
-
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(aggAddress_);
+        
+        address seedAggAddr = seeds[seedId_].aggAddress;
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(seedAggAddr);
         (,int price,,uint timeStamp,) = priceFeed.latestRoundData();
         int power;
         if (seeds[seedId_].isLong) {
@@ -77,13 +76,13 @@ contract CardFactory is ERC721, Ownable {
             power = 1000 - price*1000/seeds[seedId_].price;
         }
         uint interval = timeStamp - seeds[seedId_].timeStamp;
-        cards.push(Card(aggAddress_, power, aggAddressToType[aggAddress_], interval));
+        cards.push(Card(seedAggAddr, power, aggAddressToType[seedAggAddr], interval));
         _mint(msg.sender, cardCounter);
         seedToOwner[seedId_] = address(0);
         delete seeds[seedId_];
         ownerSeedCount[msg.sender] -= 1;
 
-        emit NewCard(cardCounter, aggAddress_, power, interval);
+        emit NewCard(cardCounter, seedAggAddr, power, interval);
         cardCounter += 1;
     }
 

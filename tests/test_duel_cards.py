@@ -22,7 +22,7 @@ def deploy_duel_cards(get_all_aggregator, get_dev_account):
 
 ##################################################
 #
-#   CardFactory: plantSeed(), seedCounter()
+#   1. CardFactory: plantSeed(), seedCounter()
 #
 ##################################################
 @pytest.mark.require_network("development")
@@ -39,13 +39,14 @@ def test_seed_count(deploy_duel_cards):
     # Assert
     assert duc.seedCounter() == 10
     for i in range(10):
+        assert txs[i].status == 1
         assert txs[i].events["NewSeed"]["seedId"] == i
         assert txs[i].events["NewSeed"]["aggAddress"] == mocks[i%4].address
         assert txs[i].events["NewSeed"]["price"] == mocks[i%4].latestAnswer()
 
 #############################################
 #
-#   CardFactory: seedToOwner()
+#   2. CardFactory: seedOwnerOf()
 #
 #############################################
 @pytest.mark.require_network("development")
@@ -54,11 +55,11 @@ def test_seed_to_owner(deploy_duel_cards):
 
     # Assert
     for i in range(10):
-        assert duc.seedToOwner(i) == accounts[i%4]
+        assert duc.seedOwnerOf(i) == accounts[i%4]
 
 #############################################
 #
-#   CardFactory: getSeedsByOwner()
+#   3. CardFactory: getSeedsByOwner()
 #
 #############################################
 @pytest.mark.require_network("development")
@@ -73,7 +74,7 @@ def test_get_seeds_by_owner(deploy_duel_cards):
 
 #############################################
 #
-#   CardFactory: printCard() with wrong owner
+#   4. CardFactory: printCard() with wrong owner
 #
 #############################################
 @pytest.mark.require_network("development")
@@ -89,23 +90,7 @@ def test_print_card_wrong_owner(deploy_duel_cards):
 
 #############################################
 #
-#   CardFactory: printCard() with wrong owner
-#
-#############################################
-@pytest.mark.require_network("development")
-def test_print_card_wrong_owner(deploy_duel_cards):
-    duc, _, _ = deploy_duel_cards
-    acc0_seeds = duc.getSeedsByOwner(accounts[0])
-
-    # Assert
-    with brownie.reverts():
-        for i in range(3):
-            tx = duc.printCard(acc0_seeds[i], {"from":accounts[i+1]})
-            assert tx.status == 0
-
-#############################################
-#
-#   CardFactory: printCard(), cardCounter()
+#   5. CardFactory: printCard(), cardCounter()
 #
 #############################################
 @pytest.mark.require_network("development")
@@ -118,38 +103,17 @@ def test_print_card(deploy_duel_cards):
 
     # Assert
     assert duc.cardCounter() == 0
-    for i in range(4):
-        tx = duc.printCard(i, {"from":accounts[i]})
-        assert tx.events["NewCard"]["cardId"] == i
-        assert tx.events["NewCard"]["aggAddress"] == mocks[i].address
-        assert tx.events["NewCard"]["power"] == -(-1)**i*changes[i]*1000
-    assert duc.cardCounter() == 4
-
-#############################################
-#
-#   CardFactory: printCard(), cardCounter()
-#
-#############################################
-@pytest.mark.require_network("development")
-def test_print_card(deploy_duel_cards):
-    duc, _, mocks = deploy_duel_cards
-
-    # Act: change price
-    changes = [0.5*i for i in range(4)]
-    [mocks[i].updateAnswer(mocks[i].latestAnswer()*(1+changes[i])) for i in range(4)]
-
-    # Assert
-    assert duc.cardCounter() == 0
-    for i in range(10):
+    for i in range(7):
         tx = duc.printCard(i, {"from":accounts[i%4]})
+        assert tx.status == 1
         assert tx.events["NewCard"]["cardId"] == i
         assert tx.events["NewCard"]["aggAddress"] == mocks[i%4].address
         assert tx.events["NewCard"]["power"] == -(-1)**i*changes[i%4]*1000
-    assert duc.cardCounter() == 10
+    assert duc.cardCounter() == 7
 
 #############################################
 #
-#   CardFactory: getSeedsByOwner() after
+#   6. CardFactory: getSeedsByOwner() after
 #
 #############################################
 @pytest.mark.require_network("development")
@@ -157,25 +121,25 @@ def test_get_seeds_by_owner_after(deploy_duel_cards):
     duc, _, _ = deploy_duel_cards
 
     # Assert
-    assert duc.getSeedsByOwner(accounts[0]) == ()
-    assert duc.getSeedsByOwner(accounts[1]) == ()
+    assert duc.getSeedsByOwner(accounts[0]) == (8,)
+    assert duc.getSeedsByOwner(accounts[1]) == (9,)
     assert duc.getSeedsByOwner(accounts[2]) == ()
-    assert duc.getSeedsByOwner(accounts[3]) == ()
+    assert duc.getSeedsByOwner(accounts[3]) == (7,)
 
 #############################################
 #
-#   CardFactory: getCardsByOwner()
+#   7. CardFactory: getCardsByOwner()
 #
 #############################################
 @pytest.mark.require_network("development")
-def test_get_seeds_by_owner_after(deploy_duel_cards):
+def test_get_cards_by_owner(deploy_duel_cards):
     duc, _, _ = deploy_duel_cards
 
     # Assert
-    assert duc.getCardsByOwner(accounts[0]) == (0,4,8)
-    assert duc.getCardsByOwner(accounts[1]) == (1,5,9)
+    assert duc.getCardsByOwner(accounts[0]) == (0,4)
+    assert duc.getCardsByOwner(accounts[1]) == (1,5)
     assert duc.getCardsByOwner(accounts[2]) == (2,6)
-    assert duc.getCardsByOwner(accounts[3]) == (3,7)
+    assert duc.getCardsByOwner(accounts[3]) == (3,)
 
 
 

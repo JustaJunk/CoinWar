@@ -32,8 +32,8 @@ contract CardFactory is ERC721, Ownable {
     Seed[] public seeds;
     Card[] public cards;
   
-    mapping (uint => address) public seedToOwner;
-    mapping (address => uint) internal ownerSeedCount;
+    mapping (uint => address) private _seedOwnerOf;
+    mapping (address => uint) private _seedBalanceOf;
 
     enum CardType {NONE, BASE, SWAP, LEND, LINK}
     mapping (address => CardType) public aggAddressToType;
@@ -54,17 +54,17 @@ contract CardFactory is ERC721, Ownable {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(aggAddress_);
         (,int price,,uint timeStamp,) = priceFeed.latestRoundData();
         seeds.push(Seed(aggAddress_, price, isLong_, timeStamp));
-        seedToOwner[seedCounter] = msg.sender;
-        ownerSeedCount[msg.sender] += 1;
+        _seedOwnerOf[seedCounter] = msg.sender;
+        _seedBalanceOf[msg.sender] += 1;
 
         emit NewSeed(seedCounter, aggAddress_, price, isLong_);
         seedCounter += 1;
     }
     
     function printCard(uint seedId_) external {
-        require(seedToOwner[seedId_] == msg.sender,
+        require(seedOwnerOf(seedId_) == msg.sender,
                 "CardFactory: caller is not the owner of this seed");
-        
+
         address seedAggAddr = seeds[seedId_].aggAddress;
         AggregatorV3Interface priceFeed = AggregatorV3Interface(seedAggAddr);
         (,int price,,uint timeStamp,) = priceFeed.latestRoundData();
@@ -78,21 +78,29 @@ contract CardFactory is ERC721, Ownable {
         uint interval = timeStamp - seeds[seedId_].timeStamp;
         cards.push(Card(seedAggAddr, power, aggAddressToType[seedAggAddr], interval));
         _mint(msg.sender, cardCounter);
-        seedToOwner[seedId_] = address(0);
+        _seedOwnerOf[seedId_] = address(0);
         delete seeds[seedId_];
-        ownerSeedCount[msg.sender] -= 1;
+        _seedBalanceOf[msg.sender] -= 1;
 
         emit NewCard(cardCounter, seedAggAddr, power, interval);
         cardCounter += 1;
     }
 
+    function seedOwnerOf(uint seedId) public view returns (address) {
+        return _seedOwnerOf[seedId];
+    }
+
+    function seedBalanceOf(address owner) public view returns (uint) {
+        return _seedBalanceOf[owner];
+    }
+
     function getSeedsByOwner(address owner) external view returns(uint[] memory) {
-        uint[] memory seedList = new uint[](ownerSeedCount[owner]);
-        uint counter = 0;
-        for (uint i = 0; i < seeds.length; i++) {
-            if (seedToOwner[i] == owner) {
-                seedList[counter] = i;
-                counter++;
+        uint[] memory seedList = new uint[](seedBalanceOf(owner));
+        uint index = 0;
+        for (uint i = 0; i < seedCounter; i++) {
+            if (seedOwnerOf(i) == owner) {
+                seedList[index] = i;
+                index++;
             }
         }
         return seedList;
@@ -100,11 +108,11 @@ contract CardFactory is ERC721, Ownable {
 
     function getCardsByOwner(address owner) external view returns(uint[] memory) {
         uint[] memory cardList = new uint[](balanceOf(owner));
-        uint counter = 0;
-        for (uint i = 0; i < cards.length; i++) {
+        uint index = 0;
+        for (uint i = 0; i < cardCounter; i++) {
             if (ownerOf(i) == owner) {
-                cardList[counter] = i;
-                counter++;
+                cardList[index] = i;
+                index++;
             }
         }
         return cardList;

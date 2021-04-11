@@ -16,7 +16,7 @@ contract DuelPoints is ERC20, Ownable {
         duelCardsAddress = address(0);
     }
 
-    modifier onlyDuelCard {
+    modifier onlyDuelCards {
         require(msg.sender == duelCardsAddress,
                 "DuelPoints: only call by DuelCards");
         _;
@@ -29,11 +29,11 @@ contract DuelPoints is ERC20, Ownable {
         ifSetDuelCardsAddress = true;
     }
 
-    function mint(address who, uint amount) external onlyDuelCard {
+    function mint(address who, uint amount) external onlyDuelCards {
         _mint(who, amount*10**decimals());
     }
 
-    function burn(address who, uint amount) external onlyDuelCard {
+    function burn(address who, uint amount) external onlyDuelCards {
         _burn(who, amount*10**decimals());
     }
 }

@@ -6,11 +6,11 @@ Inspired by yu-gi-oh (a classic anime)
 
 ---
 ## Summary
-Print your own cards according to the price change of coins (using Chainlink price-feed oracle) instead of randomness. You'll get powerful cards if you're good at price prediction. Different type of cards (ETH, LINK, UNI, COMP) cause different effects. Then you can duel with others using your self-printed cards. Your can earn tokens by winning the duel or burn your cards (mint). You can also burn token to enhance your card (forge).
+Print your own cards according to the price change of coins (using Chainlink price-feed oracle) instead of randomness. You'll get powerful cards if you're good at price prediction. Different type of cards (BASE, SWAP, LEND, LINK) cause different effects. Then you can duel with others using your self-printed cards. Your can earn duel-points by winning the duel or burn your cards (mint). You can also burn duel-points to enhance your card (forge).
 
 ---
 ## Plant Seed & Print Card
-Choose a coin (ETH, LINK, UNI, COMP) and Plant a seed at low price.  
+Choose a coin (ETH, LINK, UNI, COMP, etc) and Plant a seed at low price.  
 After a while (maybe a long while :D), you can harvest and what you get is a card.  
 The larger the increase of the coin price, the more powerful card you'll get.  
 ![image](./asset/ether_price.jpg)  
@@ -26,29 +26,61 @@ The more powerful card your burn, the more token you'll get.
 ![image](./asset/burn.jpg)![image](./asset/forge.jpg)
 
 ---
+## Run
+
+1. Install ganache
+```
+$ npm install -g ganache-cli
+```
+2. Clone this project
+```
+$ git clone https://github.com/JustaJunk/JustaDuel.git
+$ cd JustaDuel
+```
+3. Install python dependencies
+```
+$ pip install -r requirements.txt 
+```
+4. Run GUI (local blockchain)
+```
+$ brownie run gui
+```
+5. Run GUI (kovan)  
+
+Create .env file
+```
+export PRIVATE_KEY=<your private key>
+export WEB3_INFURA_PROJECT_ID=<your infura ID>
+```
+And then
+```
+$ source .env
+$ brownie run gui --network kovan
+```
+
+---
 ## Duel
 Arrange yor card (at most 5) and duel with others.  
 This is your card slot look like:  
 
-ETH0 | LINK | UNI | COMP | ETH1
+BASE0 | SWAP | LEND | LINK | BASE1
 -|-|-|-|-
 
 Different type of card has different effect.  
-1. **ETH0**: Basic power  
-2. **LINK**: ETH1 power to basic power with a ratio associated with your LINK power.  
-3. **UNI**: Swap ETH0 if your UNI power larger than opponent's ETH0 power.  
-4. **COMP**: Borrow ETH1 power from opponent with a ratio associated with your COMP power.  
-5. **ETH1**: Link by LINK card.
+1. **BASE0**: Basic power  
+2. **SWAP**: Swap ETH0 if your UNI power larger than opponent's ETH0 power.  
+3. **LEND**: Borrow ETH1 power from opponent with a ratio associated with your COMP power.  
+4. **LINK**: ETH1 power to basic power with a ratio associated with your LINK power.  
+5. **BASE1**: Link by LINK card.
 
 ---
 ## TODO list
-I'm newbie to Dapp development (and English LUL)  
+I'm a newbie to Dapp development (and English LUL)  
 There are a lot to do :(  
 1. Check smart contract security  
-2. How to ERC20 + ERC721
-3. Front-end  
-4. Artwork  
-5. Use polygon or Solana to avoid extremely high gas fee  
+2. Front-end  
+3. Artwork  
+4. Use polygon or Solana to avoid extremely high gas fee  
 
 ---
 ## Contact me  

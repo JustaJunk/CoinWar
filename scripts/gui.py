@@ -36,9 +36,9 @@ class MainApp(App):
             self.duc, self.dup, mocks = brownie.run("deploy")
             self.aggregators = [mock.address for mock in mocks]
         elif self.now_network == "kovan":
-            self.duc = JustDuel.at(JUSTADUEL_KOVAN_ADDRESS)
+            self.duc = JustaDuel.at(JUSTADUEL_KOVAN_ADDRESS)
             self.dup = DuelPoints.at(DUELPOINTS_KOVAN_ADDRESS)
-            self.aggregators = run("price_feed")
+            self.aggregators = brownie.run("price_feed")
         else:
             return Label(text="Invalid network")
 

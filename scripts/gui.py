@@ -8,31 +8,12 @@ import brownie
 from brownie import config, network, DuelPoints, JustaDuel, MockV3Aggregator
 import numpy as np
 
-DUELPOINTS_KOVAN_ADDRESS = "0x17116318342D37F7cE4e8B3Fa48351d4E680B287"
-JUSTADUEL_KOVAN_ADDRESS = "0xeC6Bb1C730B51F7E1F73797dc10f477e09c66D24"
-
-DUELPOINTS_RINKEBY_ADDRESS = "0xa5c6eCCF4A18bF88976aA84E26Ac3695AA886C86"
-JUSTADUEL_RINKEBY_ADDRESS = "0x4C1DFA89c4103f0f87b930dCE14ee3A67CF198c1"
-
 ERR_MSG = ""
 
 card_type = ["NONE", "BASE", "SWAP", "LEND", "LINK"]
-coin_list = ["ETH/USD", "UNI/USD", "COMP/USD", "LINK/USD"]
+pair_list = ["ETH/USD", "UNI/USD", "COMP/USD", "LINK/USD"]
 button_format = {"font_size": 30, "pos_hint": {"center_x": 0.5, "center_y": 0.5}}
 textinput_format = {"multiline": True, "halign": "left", "font_size": 20}
-
-def seed_display(sid, info):
-    dir_type = "long" if info[2] else "short"
-    return  f"id: {sid}\n"+ \
-            f"price: {info[1]}\n"+ \
-            f"type: {dir_type}\n"+ \
-            f"timestamp: {info[3]}"
-
-def card_display(cid, info):
-    return  f"id: {cid}\n"+ \
-            f"power: {info[1]}\n"+ \
-            f"type: {card_type[info[2]]}\n"+ \
-            f"interval: {info[3]}"
 
 class MainApp(App):
     def build(self):
@@ -47,6 +28,7 @@ class MainApp(App):
             self.aggs = [MockV3Aggregator.at(addr) for addr in brownie.run("price_feed")]
         else:
             return Label(text="Invalid network", **button_format)
+        self.agg_dict = dict(zip([agg.address for agg in self.aggs], pair_list))
 
         #--- seed box
         seed_box = BoxLayout(orientation="vertical")
@@ -119,7 +101,7 @@ class MainApp(App):
         price_box = BoxLayout(orientation="horizontal", size_hint=(1,0.2))
         for i in range(4):
             price_column = BoxLayout(orientation="vertical")
-            price_column.add_widget(Label(text=f"{coin_list[i]}",**button_format))
+            price_column.add_widget(Label(text=f"{pair_list[i]}",**button_format))
             price_column.add_widget(TextInput(text=f"{self.aggs[i].address}", readonly=True, multiline=False, halign="center", font_size=20))
             self.price_display[i] = Label(text=f"{self.aggs[i].latestRoundData()[1]/10**self.aggs[i].decimals()}", **button_format)
             price_column.add_widget(self.price_display[i])
@@ -148,7 +130,7 @@ class MainApp(App):
             tx = self.duc.plantSeed(self.agg_addr.text, instance.text[:4] == "long", {"from":self.dev_account})
             sid = tx.events["NewSeed"]["seedId"]
             self.agg_addr.text = f"Seed {sid} planted!"
-            self.seed_info.text = seed_display(sid, self.duc.seeds(sid))
+            self.seed_info.text = self._seed_display(sid)
             self.eth_balance = Label(text=f"ETH balance\n{self.dev_account.balance()}")
         except (brownie.exceptions.VirtualMachineError, ValueError):
             self.agg_addr.text = ERR_MSG
@@ -156,7 +138,7 @@ class MainApp(App):
     def show_seed_info(self, instance):
         try:
             sid = int(self.seed_info.text)
-            self.seed_info.text = seed_display(sid, self.duc.seeds(sid))
+            self.seed_info.text = self._seed_display(sid)
         except (brownie.exceptions.VirtualMachineError, ValueError):
             self.seed_info.text = ERR_MSG
 
@@ -172,7 +154,7 @@ class MainApp(App):
             tx = self.duc.printCard(int(self.seed_id.text), {"from":self.dev_account})
             cid = tx.events["NewCard"]["cardId"]
             self.seed_id.text = f"Card {cid} planted!"
-            self.card_info.text = card_display(cid, self.duc.cards(cid))
+            self.card_info.text = self._card_display(cid)
             self.eth_balance = Label(text=f"ETH balance\n{self.dev_account.balance()}")
         except (brownie.exceptions.VirtualMachineError, ValueError):
             self.seed_id.text = ERR_MSG
@@ -180,7 +162,7 @@ class MainApp(App):
     def show_card_info(self, instance):
         try:
             cid = int(self.card_info.text)
-            self.card_info.text = card_display(cid, self.duc.cards(cid))
+            self.card_info.text = self._card_display(cid)
         except (brownie.exceptions.VirtualMachineError, ValueError):
             self.card_info.text = ERR_MSG
 
@@ -208,6 +190,31 @@ class MainApp(App):
             self.eth_balance = Label(text=f"ETH balance\n{self.dev_account.balance()}")
         except (brownie.exceptions.VirtualMachineError, ValueError):
             self.card_id.text = ERR_MSG
+
+    def _seed_display(self, sid):
+        info = self.duc.seeds(sid)
+        dir_type = "long" if info[2] else "short"
+        if info[0] in self.agg_dict:
+            pair = self.agg_dict[info[0]]
+        else:
+            pair = "None"
+        return  f"id: {sid}\n"+ \
+                f"pair: {pair}\n"+ \
+                f"type: {dir_type}\n"+ \
+                f"price: {info[1]}\n"+ \
+                f"timestamp: {info[3]}"
+
+    def _card_display(self, cid):
+        info = self.duc.cards(cid)
+        if info[0] in self.agg_dict:
+            pair = self.agg_dict[info[0]]
+        else:
+            pair = "None"
+        return  f"id: {cid}\n"+ \
+                f"pair: {pair}\n"+ \
+                f"type: {card_type[info[2]]}\n"+ \
+                f"power: {info[1]}\n"+ \
+                f"interval: {info[3]}"
 
 def main():
     MainApp().run()

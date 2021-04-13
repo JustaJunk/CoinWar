@@ -1,6 +1,7 @@
 # JustaDuel
 Ethereum game (#ChainlinkHackathon2021)  
 Inspired by yu-gi-oh (a classic anime)
+Base on chainlink-mix
 
 ![image](./asset/crypto_duel.jpg)  
 
@@ -41,11 +42,15 @@ $ cd JustaDuel
 ```
 $ pip install -r requirements.txt 
 ```
-4. Run GUI (local blockchain)
+4. Compile smart contract
+```
+$ brownie compile --all
+```
+5. Run GUI (local blockchain)
 ```
 $ brownie run gui
 ```
-5. Run GUI (kovan)  
+6. Run GUI (kovan)  
 
 Create .env file
 ```

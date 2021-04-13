@@ -151,7 +151,6 @@ class MainApp(App):
     def get_cards_by_owner(self, instance):
         try:
             card_ids = self.duc.getCardsByOwner(self.card_owner_addr.text)
-            print(card_ids)
             self.card_owner_addr.text = ", ".join([str(cid) for cid in card_ids])
         except (brownie.exceptions.VirtualMachineError, ValueError):
             self.card_owner_addr.text = self.dev_account.address

@@ -50,7 +50,7 @@ $ brownie compile --all
 ```
 $ brownie run gui
 ```
-6. Run GUI (kovan)  
+6. Run GUI (Kovan or Rinkeby)  
 
 Create .env file in which set private key
 ```
@@ -64,6 +64,7 @@ $ set WEB3_INFURA_PROJECT_ID=<your infura ID> // windows
 Run gui
 ```
 $ brownie run gui --network kovan
+$ brownie run gui --network rinkeby
 ```
 
 ---

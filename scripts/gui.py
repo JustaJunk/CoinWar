@@ -5,11 +5,15 @@ from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 import brownie
-from brownie import network, DuelPoints, JustaDuel, MockV3Aggregator
+from brownie import config, network, DuelPoints, JustaDuel, MockV3Aggregator
 import numpy as np
 
 DUELPOINTS_KOVAN_ADDRESS = "0x17116318342D37F7cE4e8B3Fa48351d4E680B287"
 JUSTADUEL_KOVAN_ADDRESS = "0xeC6Bb1C730B51F7E1F73797dc10f477e09c66D24"
+
+DUELPOINTS_RINKEBY_ADDRESS = "0xa5c6eCCF4A18bF88976aA84E26Ac3695AA886C86"
+JUSTADUEL_RINKEBY_ADDRESS = "0x4C1DFA89c4103f0f87b930dCE14ee3A67CF198c1"
+
 ERR_MSG = ""
 
 card_type = ["NONE", "BASE", "SWAP", "LEND", "LINK"]
@@ -37,11 +41,10 @@ class MainApp(App):
         self.now_network = network.show_active()
         if self.now_network == "development":
             self.duc, self.dup, self.aggs = brownie.run("deploy")
-        elif self.now_network == "kovan":
-            self.duc = JustaDuel.at(JUSTADUEL_KOVAN_ADDRESS)
-            self.dup = DuelPoints.at(DUELPOINTS_KOVAN_ADDRESS)
+        elif self.now_network in config["networks"]:
+            self.dup = DuelPoints.at(config["networks"][self.now_network]["duel_points_address"])
+            self.duc = JustaDuel.at(config["networks"][self.now_network]["justa_duel_address"])
             self.aggs = [MockV3Aggregator.at(addr) for addr in brownie.run("price_feed")]
-
         else:
             return Label(text="Invalid network", **button_format)
 
@@ -102,13 +105,14 @@ class MainApp(App):
         burn_card_button.bind(on_press=self.burn_card)
         turn_card_button = Button(text="turn card", **button_format)
         turn_card_button.bind(on_press=self.turn_card)
-        self.duel_points_balance = Label(text=str(self.dup.balanceOf(self.dev_account)/10**self.dup.decimals()), **button_format)     
+        self.duel_points_balance = Label(text=f"Duel Points\n{self.dup.balanceOf(self.dev_account)/10**self.dup.decimals()}", **button_format)
+        self.eth_balance = Label(text=f"ETH balance\n{self.dev_account.balance()/10**18}", **button_format)
         burn_box.add_widget(update_button)
         burn_box.add_widget(self.card_id)
         burn_box.add_widget(burn_card_button)
         burn_box.add_widget(turn_card_button)
-        burn_box.add_widget(Label(text="Duel Points:", **button_format))
         burn_box.add_widget(self.duel_points_balance)
+        burn_box.add_widget(self.eth_balance)
 
         #--- price box
         self.price_display = [0]*4
@@ -145,6 +149,7 @@ class MainApp(App):
             sid = tx.events["NewSeed"]["seedId"]
             self.agg_addr.text = f"Seed {sid} planted!"
             self.seed_info.text = seed_display(sid, self.duc.seeds(sid))
+            self.eth_balance = Label(text=f"ETH balance\n{self.dev_account.balance()}")
         except (brownie.exceptions.VirtualMachineError, ValueError):
             self.agg_addr.text = ERR_MSG
 
@@ -168,6 +173,7 @@ class MainApp(App):
             cid = tx.events["NewCard"]["cardId"]
             self.seed_id.text = f"Card {cid} planted!"
             self.card_info.text = card_display(cid, self.duc.cards(cid))
+            self.eth_balance = Label(text=f"ETH balance\n{self.dev_account.balance()}")
         except (brownie.exceptions.VirtualMachineError, ValueError):
             self.seed_id.text = ERR_MSG
 
@@ -188,8 +194,9 @@ class MainApp(App):
     def burn_card(self, instance):
         try:
             self.duc.burnCard(int(self.card_id.text), {"from":self.dev_account})
-            self.duel_points_balance.text = str(self.dup.balanceOf(self.dev_account)/10**self.dup.decimals())
+            self.duel_points_balance.text = f"Duel Points\n{self.dup.balanceOf(self.dev_account)/10**self.dup.decimals()}"
             self.card_id.text = f"Card {self.card_id.text} burned!"
+            self.eth_balance = Label(text=f"ETH balance\n{self.dev_account.balance()}")
         except (brownie.exceptions.VirtualMachineError, ValueError):
             self.card_id.text = ERR_MSG
 
@@ -198,6 +205,7 @@ class MainApp(App):
             self.duc.turnCard(int(self.card_id.text), {"from":self.dev_account})
             self.duel_points_balance.text = str(self.dup.balanceOf(self.dev_account)/10**self.dup.decimals())
             self.card_id.text = f"Card {self.card_id.text} turned!"
+            self.eth_balance = Label(text=f"ETH balance\n{self.dev_account.balance()}")
         except (brownie.exceptions.VirtualMachineError, ValueError):
             self.card_id.text = ERR_MSG
 

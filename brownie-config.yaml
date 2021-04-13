@@ -33,11 +33,16 @@ networks:
     uni_usd_price_feed: '0xDA5904BdBfB4EF12a3955aEcA103F51dc87c7C39'
     comp_usd_price_feed: '0xECF93D14d25E02bA2C13698eeDca9aA98348EFb6'
     link_usd_price_feed: '0x396c5E36DD0a0F5a5D33dae44368D4193f69a1F0'
+    justa_duel_address: '0xeC6Bb1C730B51F7E1F73797dc10f477e09c66D24'
+    duel_points_address: '0x17116318342D37F7cE4e8B3Fa48351d4E680B287'
   rinkeby:
     eth_usd_price_feed: '0x8A753747A1Fa494EC906cE90E9f37563A8AF630e'
     uni_usd_price_feed: '0xcf0f51ca2cDAecb464eeE4227f5295F2384F84ED' # actually BNB/USD price feed
     comp_usd_price_feed: '0xE96C4407597CD507002dF88ff6E0008AB41266Ee' # actually SNX/USD price feed
     link_usd_price_feed: '0xd8bD0a1cB028a31AA859A21A3758685a95dE4623'
+    justa_duel_address: '0x4C1DFA89c4103f0f87b930dCE14ee3A67CF198c1'
+    duel_points_address: '0xa5c6eCCF4A18bF88976aA84E26Ac3695AA886C86'
+    
 
 # wallets
 wallets:

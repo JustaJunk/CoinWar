@@ -52,14 +52,17 @@ $ brownie run gui
 ```
 6. Run GUI (kovan)  
 
-Create .env file
+Create .env file in which set private key
 ```
-export PRIVATE_KEY=<your private key>
-export WEB3_INFURA_PROJECT_ID=<your infura ID>
+PRIVATE_KEY=<your private key>
 ```
-And then
+Set infura project ID
 ```
-$ source .env
+$ export WEB3_INFURA_PROJECT_ID=<your infura ID> // linux or mac
+$ set WEB3_INFURA_PROJECT_ID=<your infura ID> // windows
+```
+Run gui
+```
 $ brownie run gui --network kovan
 ```
 
@@ -73,10 +76,10 @@ BASE0 | SWAP | LEND | LINK | BASE1
 
 Different type of card has different effect.  
 1. **BASE0**: Basic power  
-2. **SWAP**: Swap ETH0 if your UNI power larger than opponent's ETH0 power.  
-3. **LEND**: Borrow ETH1 power from opponent with a ratio associated with your COMP power.  
-4. **LINK**: ETH1 power to basic power with a ratio associated with your LINK power.  
-5. **BASE1**: Link by LINK card.
+2. **SWAP**: Swap BASE0 if your UNI power larger than opponent's BASE0 power.  
+3. **LEND**: Borrow BASE1 power from opponent with a ratio associated with your COMP power.  
+4. **LINK**: Add BASE1 power to basic power with a ratio associated with your LINK power.  
+5. **BASE1**: Linked by LINK card.
 
 ---
 ## TODO list

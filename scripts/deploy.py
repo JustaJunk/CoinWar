@@ -3,6 +3,7 @@ from brownie import (
     network, accounts, config,
     MockV3Aggregator,
     CardFactory, DuelPoints, DuelCards, JustaDuel)
+import brownie
 
 def get_dev_account():
     if network.show_active() == "development":
@@ -12,8 +13,8 @@ def get_dev_account():
     else:
         return accounts[0]
 
-def get_mocks(num):
-    return [MockV3Aggregator.deploy(0,(i+1)*1000, {"from": accounts[1]}) for i in range(num)]
+def get_aggregators():
+    return [MockV3Aggregator.at(addr) for addr in brownie.run("price_feed")]
 
 def card_factory():
     return CardFactory.deploy(
@@ -49,20 +50,9 @@ def justa_duel():
 def main():
     dev = get_dev_account()
     duc, dup = justa_duel()
-    if network.show_active() == "development":
-        mocks = get_mocks(4)
-        addrs = [mock.address for mock in mocks]
-    elif network.show_active() in config["networks"]:
-        mocks = None
-        addrs = [config["networks"][network.show_active()]["eth_usd_price_feed"],
-                 config["networks"][network.show_active()]["uni_usd_price_feed"],
-                 config["networks"][network.show_active()]["comp_usd_price_feed"],
-                 config["networks"][network.show_active()]["link_usd_price_feed"]]
-    else:
-        print("Invalid network to deploy")
-        return
+    aggs = get_aggregators()
 
-    [duc.setAddressType(addrs[i], i+1, {"from":dev}) for i in range(4)]
-    return duc, dup, mocks
+    [duc.setAddressType(aggs[i].address, i+1, {"from":dev}) for i in range(4)]
+    return duc, dup, aggs
 
 
